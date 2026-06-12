@@ -6,4 +6,4 @@ echo "Deployment logic goes here..."
 
 QUICK_DEPLOYMENT=FASTER_DEPLOY_PLACEHOLDER
 
-echo "Successfully completed post-install deployment."
+echo "Successfully completed post-install deployment......"
