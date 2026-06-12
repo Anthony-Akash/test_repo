@@ -1,0 +1,45 @@
+name: Branch Policy Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Fetches the commit we want to check
+
+      - name: Check commit message and after_install
+        run: |
+          # Use github.event to safely get the PR title and body if needed,
+          # or use git log to get the commit message. 
+          # Note: for PRs, checking the PR title/body might be better, 
+          # but we will check the HEAD commit message as requested.
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+
+          echo "Commit Message:"
+          echo "$COMMIT_MSG"
+
+          if echo "$COMMIT_MSG" | grep -qi "fast"; then
+            echo "Fast deployment detected. Validating after_install.sh..."
+
+            if [ ! -f "scripts/after_install.sh" ]; then
+              echo "❌ Commit contains 'fast' but scripts/after_install.sh does not exist."
+              exit 1
+            fi
+
+            grep -q "ENABLE_FAST_MODE=true" scripts/after_install.sh
+
+            if [ $? -ne 0 ]; then
+              echo "❌ Commit contains 'fast' but after_install.sh is not configured with ENABLE_FAST_MODE=true."
+              exit 1
+            fi
+
+            echo "✅ after_install.sh validation passed."
+          else
+            echo "No 'fast' keyword found. Skipping validation."
+          fi
