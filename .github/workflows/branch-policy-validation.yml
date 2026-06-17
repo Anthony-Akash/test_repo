@@ -53,6 +53,6 @@ jobs:
               ;;
           esac
 
-          echo "::warning title=Branch Policy Violation::Branch $HEAD is not allowed to merge into $BASE. This is currently a WARNING, but will block merges in the future."
+          echo "::error title=Branch Policy Violation::Branch $HEAD is not allowed to merge into $BASE. This is currently a WARNING, but will block merges in the future."
           echo "⚠️ Branch $HEAD is not allowed to merge into $BASE"
-          exit 0
+          exit 1
